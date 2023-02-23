@@ -2,6 +2,7 @@ from ase.optimize import BFGS
 from ase.build import fcc111
 from gpaw import GPAW, PW
 from ase.optimize import GPMin
+from ase.io.trajectory import Trajectory
 import numpy as np
 
 lattice_constants = [4.179, 3.969, 3.839]
@@ -19,11 +20,12 @@ for i in range(3):
             mode=PW(cutoff),
             kpts=k)
   surface.set_calculator(calc)
-  dyn = GPMin(surface)
+  dyn = GPMin(surface,trajectory=f'{materialList[i]}.traj',
+              logfile=f'{materialList[i]}.log')
   dyn.run(fmax=0.01, steps=100)
-  surface.set_calculator(calc)
 
   E[i] = surface.get_potential_energy()
+  calc.write(f'{materialList[i]}.gpw')
 
 np.savetxt('energies.txt',E)
 
