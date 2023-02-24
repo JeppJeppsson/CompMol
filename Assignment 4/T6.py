@@ -18,8 +18,8 @@ for i in range(3):
         calc = GPAW(calcs[i]) # Restart GPAW cals from T3
         surface.set_calculator(calc)
         dyn = BFGS(surface,
-                   trajectory=f'{metals[i]}_{adsorbants[j]}.traj',
-                   logfile=f'{metals[i]}_{adsorbants[j]}.log')
+                   trajectory=f'Data/T6/{metals[i]}_{adsorbants[j]}.traj',
+                   logfile=f'Data/T6/{metals[i]}_{adsorbants[j]}.log')
         dyn.run(fmax=.01)
         E[i,j] = surface.get_potential_energy()
     
