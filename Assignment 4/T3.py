@@ -1,17 +1,20 @@
 from ase.optimize import BFGS
 from ase.build import fcc111
 from gpaw import GPAW, PW
-from ase.optimize import GPMin
+from ase.optimize import GPMin, BFGS
 from ase.io.trajectory import Trajectory
 import numpy as np
 
 lattice_constants = [4.179, 3.969, 3.839]
-materialList      = ["Au","Pt", "Rh"]
+E_bulk            = [-3.146,-6.431,-7.306]
+materialList      = ['Au','Pt','Rh']
 
 k = (4,4,1)
 cutoff = 450
 
-E = np.zeros(3)
+E_pot  = np.zeros(3)
+E_surf = np.zeros(3)
+area   = np.zeros(3)
 
 for i in range(3):
   material = materialList[i]
@@ -20,16 +23,26 @@ for i in range(3):
             mode=PW(cutoff),
             kpts=k)
   surface.set_calculator(calc)
-  dyn = GPMin(surface,trajectory=f'{materialList[i]}.traj',
-              logfile=f'{materialList[i]}.log')
+  dyn = BFGS(surface,trajectory=f'{materialList[i]}.traj',
+             logfile=f'{materialList[i]}.log')
   dyn.run(fmax=0.01, steps=100)
 
-  E[i] = surface.get_potential_energy()
-  calc.write(f'{materialList[i]}.gpw')
+  calc.write(f'{materialList[i]}.gpw') # Save calc for coming tasks
 
-np.savetxt('energies.txt',E)
+  E_pot[i] = surface.get_potential_energy()
+  
+  # Finding area of the surface
+  dims_angles = surface.get_cell_lenghts_and_angles()
+  area[i] = dims_angles[0]*dims_angles[1]*np.sin(dims_angles[5]) # A_parallelogram = ABsin(theta_AB)
 
+  # Calculating the surface energy acc to E_S = (E_slab - N*E_bulk)/2A
+  E_surf[i] = (E_pot[i] - 9*E_bulk[i]) / (2*area[i])
+
+# Saving relevant energies
+np.savetxt('Potential energies.txt',E_pot)
+np.savetxt('Surface energies.txt',E_surf)
+np.savetxt('Areas.txt',area)
 print('Surfaces energies:')
 
 for i in range(3):
-    print(f'{materialList[i]} = {E[i]} eV')
+    print(f'{materialList[i]} = {E_surf[i]} eV')
