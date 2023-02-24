@@ -31,12 +31,13 @@ for i in range(3):
 
   E_pot[i] = surface.get_potential_energy()
   
-  # Finding area of the surface
-  dims_angles = surface.get_cell_lenghts_and_angles()
-  area[i] = dims_angles[0]*dims_angles[1]*np.sin(dims_angles[5]) # A_parallelogram = ABsin(theta_AB)
+  # Finding area of the surface (A_parallelogram = ABsin(theta_AB))
+
+  dims_angles = surface.get_cell_lengths_and_angles()
+  area[i] = dims_angles[0]*dims_angles[1]*np.sin(dims_angles[5]*np.pi/180)
 
   # Calculating the surface energy acc to E_S = (E_slab - N*E_bulk)/2A
-  E_surf[i] = (E_pot[i] - 9*E_bulk[i]) / (2*area[i])
+  E_surf[i] = (E_pot[i] - surface.get_number_of_atoms()*E_bulk[i]) / (2*area[i])
 
 # Saving relevant energies
 np.savetxt('Potential energies.txt',E_pot)
