@@ -1,30 +1,22 @@
-#Task 4
 from ase.build import molecule
 from gpaw import PW,GPAW
-from ase.vibrations import Vibrations
-from ase.thermochemistry import IdealGasThermo
-from ase.calculators.emt import EMT
-from ase.optimize import QuasiNewton
-
-
+import numpy as np
 
 moleculeList = ["CO", "O2"] 
-cutoff = 450 
-potentialEnergyList = []
-roomtemp = 300 # 300k
-atmosphere = 10**5 #1bar
+cutoff = 450 # eV
+roomtemp = 300 # k
+atmosphere = 10**5 #bar
 
+E = np.zeros(2)
 
-for material in moleculeList: #For task 4
-
-    atoms = molecule(material, cell=(12, 12, 12))
+for i in range(2):
+    atoms = molecule(moleculeList[i], cell=(12, 12, 12))
     atoms.center()
-    
-    
     calc = GPAW(xc='PBE',
                 mode=PW(cutoff),
                 kpts={'gamma': True})
     atoms.set_calculator(calc)
-    print(f"---------------Energy for {material} =  {atoms.get_potential_energy()} eV ------------------")
 
+    E[i] = atoms.get_potential_energy()
 
+np.savetxt('Data/T4/gas energies.txt',E)
