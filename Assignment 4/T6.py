@@ -15,7 +15,9 @@ E = np.zeros((3,2))
 
 for i in range(3):
     for j in range(2):
-        surface = read(f'Data/Adsorbed/{metals[i]}_{adsorbants[j]}.xyz') # Surfaces with absorbates
+        # Surfaces with adsorbates
+        surface = read(f'Data/Adsorbed/{metals[i]}_{adsorbants[j]}.xyz')
+
         calc = GPAW(calcs[i]) # Restart GPAW calcs from T3
         surface.set_calculator(calc)
         dyn = BFGS(surface,
@@ -34,19 +36,16 @@ E_gases   = np.loadtxt('Data/T4/gas energies.txt')
 E_O,E_CO  = np.loadtxt('Data/T6/adsorbed potential energies.txt',
                         unpack=True) # Surfaces w adsorbate
 
-# Calculate the adsorption energies according to
-# E_adsorption = E_with_adsorbate - (E_without_adsorbate + E_gas/2)
-E_O_ads  = E_O - (E_surface - E_gases[0]/4) # We approximate E_O = E_O2/2
-E_CO_ads = E_CO - (E_surface - E_gases[1]/2)
-O_adsorp  = E_surface-E_O
-CO_adsorp = E_surface-E_CO
+# Finding adsorption energies (E_ad = E_constituents - E_tot)
+E_ad_O  = E_surface + E_gases[0]/2 - E_O # E_gases is for O2, we approximate half for O
+E_ad_CO = E_surface + E_gases[1] - E_CO 
 
 # Activation energies
-E_activation = .22 - .3*(O_adsorp + CO_adsorp)
+E_activation = .22 - .3*(E_ad_O + E_ad_CO)
 
 print('Adsorption Energies ([Au,Pt,Rh])')
-print(f'O:  {O_adsorp} eV')
-print(f'CO: {CO_adsorp} eV','\n')
+print(f'O:  {E_ad_O} eV')
+print(f'CO: {E_ad_CO} eV','\n')
 
 print('Activation energies ([Au,Pt,Rh])')
 print(f'{E_activation} eV')
