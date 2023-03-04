@@ -1,0 +1,15 @@
+Potential errors A4
+-------------------
+
+Task 3:
+- row 27: We specify steps = 100, rather than just a convergence limit
+
+Task 4:
+- We don't specify a vacuum within the molecule() function (vacuum = 12)
+
+Task 5:
+- We use 300 K and 100 000 Pa instead of the more accurate 298.15 K and 101325 Pa
+
+Task 6:
+- We attempt to restart the calcs instead of creating new ones
+- Patrik and Markus use fmax = .1 instead of .01?
