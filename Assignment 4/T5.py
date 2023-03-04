@@ -27,7 +27,6 @@ for i in range(len(moleculeList)): #For task 5
     spin = spin_types[i]
     symmetry = symmetries[i]
 
-
     atoms = molecule(material, cell=(12, 12, 12))
     atoms.calc = EMT()
     dyn = QuasiNewton(atoms)
